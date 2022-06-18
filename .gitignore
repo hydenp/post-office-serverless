@@ -1,0 +1,10 @@
+# ignore virtualenv
+env/
+
+# ignore credentials files
+credentials.json
+token.json
+
+# ignore temp fiels
+__pycache__
+deps.zip
