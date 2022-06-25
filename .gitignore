@@ -3,7 +3,8 @@ env/
 
 # ignore credentials files
 credentials.json
-token.json
+client_secret.json
+src/test_app.py
 
 # ignore temp fiels
 __pycache__

@@ -1,0 +1,17 @@
+{
+  "auth": {
+    "token": "string"
+  },
+  "emails": [
+    {
+      "recipient": "string",
+      "subject": "string",
+      "body": "string"
+    },
+    {
+      "recipient": "string",
+      "subject": "string",
+      "body": "string"
+    }
+  ]
+}

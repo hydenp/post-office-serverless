@@ -1,1 +1,5 @@
+# ignore temp files
 src/__pycache__
+
+# ignore test file containing tokens
+src/test_app.py
