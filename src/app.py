@@ -1,37 +1,23 @@
-from googleapiclient.discovery import build
-
-from auth import auth
-from message import create_message
+from gmail import GmailService, MimeMessage
 
 
 def handler(event, context):
+    # get the authentication credentials from the payload
+    service = GmailService.get_gmail_service(token=event['auth']['token'])
 
-    # get the authentication credentials
-    creds = auth()
+    results = []
+    for email in event['emails']:
+        # create the message
+        message = MimeMessage(recipient=email["recipient"], subject=email["subject"], body=email["body"])
 
-    # create the service with the creds
-    service = build('gmail', 'v1', credentials=creds)
+        # send the message
+        print('sending...')
+        result = message.send(service)
 
-    # create the message with the
-    mess = create_message(
-        recipient=event["recipient"], subject=event["subject"], body=event["message"])
+        print(result)
+        results.append(result)
 
-    result = service.users().messages().send(
-        userId='me', body={'raw': mess}).execute()
-
-    response = {
+    return {
         "statusCode": 200,
-        "body": result
+        "body": results
     }
-
-    return response
-
-
-if __name__ == '__main__':
-    test_request_body = {
-        "recipient": "hyden.testing@gmail.com",
-        "subject": "Test from Lambda",
-        "message": "Test message"
-    }
-
-    handler(test_request_body, None)
