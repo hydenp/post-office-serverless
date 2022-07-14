@@ -16,9 +16,14 @@ build-prod:
 
 
 push-prod:
+	# push the image to ECR repo
 	docker push 743917738826.dkr.ecr.us-west-1.amazonaws.com/post-office-dev
 
-release-prod: build-prod push-prod
+update-func:
+	# update the post-office-dev function to the latest image
+	aws lambda update-function-code --function-name post-office-dev --image-uri 743917738826.dkr.ecr.us-west-1.amazonaws.com/post-office-dev:latest
+
+release-prod: build-prod push-prod update-func
 
 # re-login to elastic container registry (ECR)
 login:

@@ -112,11 +112,8 @@ class GmailService:
         :return: dict
         """
         return {
-            "statusCode": 207,
-            "headers": {
-                "content-type": "application/json"
-            },
-            "body": "bad token"
+            "status": "bad_token",
+            "body": {}
         }
 
     def send_emails(self):
@@ -141,11 +138,8 @@ class GmailService:
             })
 
         return {
-            "statusCode": 200,
-            "headers": {
-                "content-type": "application/json"
-            },
-            "body": json.dumps({"results": results})
+            "status": "success",
+            "body": {"results": results}
         }
 
 
