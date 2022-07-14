@@ -4,6 +4,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 import boto3
+import google.auth.exceptions
 from botocore.exceptions import ClientError
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
@@ -17,6 +18,12 @@ class GmailService:
     retrieve auth from AWS Secrets Manager
     Create a Credentials object to use when building gmail service
     """
+
+    def __init__(self, token, emails):
+        self.token = token
+        self.emails = emails
+
+        self.service = self.get_gmail_service()
 
     @staticmethod
     def get_google_secret():
@@ -74,27 +81,72 @@ class GmailService:
                 decoded_binary_secret = base64.b64decode(get_secret_value_response['SecretBinary'])
                 return json.loads(decoded_binary_secret)
 
-    @staticmethod
-    def create_credentials(token):
+    def create_credentials(self):
+        """
+        create a credentials object with the token for building the service
+        :return: google.oauth2.credentials.Credentials
+        """
         # get the secrets from Amazon Secret Manager
         secrets = GmailService.get_google_secret()
 
         # create the credentials object
         return Credentials(
-            token=token,
+            token=self.token,
             client_id=secrets['google_client_id'],
             client_secret=secrets['google_client_secret'],
             scopes=SCOPES,
         )
 
-    @staticmethod
-    def get_gmail_service(token):
+    def get_gmail_service(self):
         """
-        create a gmail service wit the auth
+        create a gmail service with the auth
         :return: googleapiclient.discovery.build
         """
-        creds = GmailService.create_credentials(token)
+        creds = self.create_credentials()
         return build('gmail', 'v1', credentials=creds)
+
+    @staticmethod
+    def bad_token():
+        """
+        return a response body with 207 to signify that service is unusable as token is bad
+        :return: dict
+        """
+        return {
+            "statusCode": 207,
+            "headers": {
+                "content-type": "application/json"
+            },
+            "body": "bad token"
+        }
+
+    def send_emails(self):
+        """
+        loop across the emails and try to send using created service
+        :return: dict
+        """
+        results = []
+        for email in self.emails:
+            # create the message
+            message = MimeMessage(recipient=email["recipient"], subject=email["subject"], body=email["body"])
+
+            # try and send the message. catch the exception if the token is no good
+            try:
+                result = message.send(self.service)
+            except google.auth.exceptions.RefreshError:
+                return GmailService.bad_token()
+
+            results.append({
+                "recipient": email["recipient"],
+                "status": result["labelIds"][0]
+            })
+
+        return {
+            "statusCode": 200,
+            "headers": {
+                "content-type": "application/json"
+            },
+            "body": json.dumps({"results": results})
+        }
 
 
 class MimeMessage:
