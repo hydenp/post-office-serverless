@@ -9,7 +9,7 @@ from botocore.exceptions import ClientError
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 
-GOOGLE_SECRETS_NAMES = 'google/mailthem-test/postoffice-1'
+GOOGLE_SECRETS_NAMES = 'post-office-tf/google_secrets/prod'
 SCOPES = ['https://mail.google.com/']
 
 
