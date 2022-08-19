@@ -10,7 +10,7 @@ provider "aws" {
 ##################################################
 # SecretsManager Provisioning
 resource "aws_secretsmanager_secret" "post_office_secrets" {
-  name = secret_name
+  name = local.secret_name
 }
 
 # Creating a AWS secret versions for aws
