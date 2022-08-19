@@ -5,6 +5,8 @@ env/
 credentials.json
 client_secret.json
 src/test_app.py
+secret.tfvars
+*.tfstate*
 
 # ignore temp fiels
 __pycache__
