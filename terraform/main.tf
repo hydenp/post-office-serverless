@@ -35,6 +35,10 @@ resource "aws_ecr_repository" "lambda_ecr_repo" {
 ##################################################
 # Lambda Function Provisioning
 data "aws_ecr_image" "lambda_image" {
+  depends_on = [
+    aws_ecr_repository.lambda_ecr_repo
+  ]
+
   repository_name = local.ecr_repository_name
   image_tag       = local.ecr_image_tag
 }
