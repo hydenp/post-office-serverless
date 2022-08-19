@@ -10,7 +10,7 @@ provider "aws" {
 ##################################################
 # SecretsManager Provisioning
 resource "aws_secretsmanager_secret" "post_office_secrets" {
-  name = secret_name
+  name = local.secret_name
 }
 
 # Creating a AWS secret versions for aws
@@ -31,15 +31,14 @@ resource "aws_ecr_repository" "lambda_ecr_repo" {
   name = local.ecr_repository_name
 }
 
-data "aws_ecr_image" "lambda_image" {
-  repository_name = local.ecr_repository_name
-  image_tag       = local.ecr_image_tag
-}
-
 
 ##################################################
 # Lambda Function Provisioning
 data "aws_ecr_image" "lambda_image" {
+  depends_on = [
+    aws_ecr_repository.lambda_ecr_repo
+  ]
+
   repository_name = local.ecr_repository_name
   image_tag       = local.ecr_image_tag
 }
